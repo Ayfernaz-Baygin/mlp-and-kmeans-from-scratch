@@ -1,0 +1,105 @@
+PART A - MLP REGRESSION REPORT
+============================================================
+
+1. DATASET INFORMATION
+------------------------------------------------------------
+Input features after preprocessing: ['Age (Years)', 'Net Square Meters (m2)', 'Neighborhood_1', 'Neighborhood_2', 'Neighborhood_3', 'Neighborhood_4']
+Target variable: Price (TRY)
+Normalization: Min-Max normalization
+Categorical preprocessing: One-hot encoding for Neighborhood
+Test normalization rule: Test set normalized using TRAIN set min-max values
+
+2. NETWORK ARCHITECTURE
+------------------------------------------------------------
+Input layer neurons: 6
+Number of hidden layers: 1
+Hidden layer neurons: 16
+Output layer neurons: 1
+Hidden layer activation: tanh
+Output layer activation: linear
+
+3. TRAINING PARAMETERS
+------------------------------------------------------------
+Initial learning rate: 0.01
+Momentum: 0.9
+Weight update method: Gradient Descent with Momentum
+Maximum epochs: 8000
+Actual training epochs: 8000
+Stopping criterion: Early stopping with tolerance=1e-10, patience=800
+Training end reason: Maximum epoch limit reached
+Final training loss (normalized MSE): 0.00733762
+
+4. TRAIN RESULTS
+------------------------------------------------------------
+MAE: 2700746.015079
+MSE: 17259841246655.916016
+RMSE: 4154496.509405
+R2 (coefficient of determination): 0.314390
+
+5. TEST RESULTS (MACRO AVERAGE)
+------------------------------------------------------------
+MAE: 3144322.403733
+MSE: 24774707104490.753906
+RMSE: 4977419.723561
+R2 (coefficient of determination): 0.245548
+
+6. FINAL WEIGHTS AND BIASES
+------------------------------------------------------------
+W1 shape: (6, 16)
+W1:
+[[-0.116352  0.579162  0.649356  0.114304 -0.254592 -0.396425 -0.401875
+   0.378044  0.153969  0.355845 -0.434944  0.379757  0.171541 -0.121024
+  -0.300036 -0.171325]
+ [-0.183246  0.077853  0.036433 -0.280714  0.118056 -0.409694 -0.198895
+  -0.137558  0.019676  0.310795 -0.313134 -0.018664  0.007241 -0.490033
+   0.114212 -0.339666]
+ [-0.444706  0.458473  0.390979  0.195536 -0.318478 -0.428977  0.191371
+  -0.057883 -0.284213 -0.017183 -0.481858  0.460281 -0.370112  0.131574
+  -0.252132 -0.001724]
+ [ 0.058009 -0.321425  0.45449   0.230368  0.37112   0.431539  0.088853
+   0.440023 -0.356796 -0.353796 -0.476435 -0.156037 -0.150706 -0.315031
+   0.304204 -0.201211]
+ [-0.232251  0.092871 -0.235921  0.38947  -0.350198  0.496306  0.311273
+  -0.31578  -0.562878  0.41151   0.239315  0.175511  0.34944  -0.366333
+  -0.098926 -0.334309]
+ [ 0.38415   0.095575 -0.103864 -0.365132 -0.127436 -0.146949  0.307254
+   0.142328  0.328569 -0.024062 -0.452279  0.228566  0.240681  0.136848
+   0.364785  0.030458]]
+
+b1 shape: (1, 16)
+b1:
+[[ 0.020261  0.012432  0.080545 -0.019021 -0.03817   0.033807  0.079906
+   0.00157   0.06129   0.038574 -0.028682  0.001318 -0.118192  0.03702
+   0.036049  0.029562]]
+
+W2 shape: (16, 1)
+W2:
+[[-0.119273]
+ [-0.192811]
+ [-0.456277]
+ [-0.308962]
+ [-0.408167]
+ [ 0.17376 ]
+ [-0.254509]
+ [ 0.017699]
+ [ 0.301844]
+ [-0.398587]
+ [-0.161488]
+ [ 0.214453]
+ [-0.475103]
+ [-0.460725]
+ [-0.291083]
+ [-0.336844]]
+
+b2 shape: (1, 1)
+b2:
+[[0.104002]]
+
+7. COMMENTS
+------------------------------------------------------------
+The MLP model was implemented from scratch using only NumPy and Pandas.
+All input variables and the target variable were normalized with min-max normalization.
+Since the Neighborhood attribute is categorical, one-hot encoding was applied before normalization.
+The model was trained with back-propagation and momentum-based weight updates.
+Performance was evaluated on both training and test sets using MAE, MSE, RMSE, and R2.
+The relatively low R2 values indicate that the relationship between the input features and house prices could only be captured partially by the selected network architecture and training configuration.
