@@ -3,16 +3,14 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import os
 
-# Ensure visuals folder exists (prevents crash during savefig)
+# Ensure visuals folder exists
 if not os.path.exists("visuals"):
     os.makedirs("visuals")
 
-# matplotlib is used only for visualization purposes, not for clustering.
-# Fixed seed is used to make results repeatable.
+# Fixed seed for reproducibility
 np.random.seed(42)
 
 
-# Min-max normalization helpers
 def minmax_fit(data):
     data_min = np.min(data, axis=0)
     data_max = np.max(data, axis=0)
@@ -25,7 +23,6 @@ def minmax_transform(data, data_min, data_max):
     return (data - data_min) / denominator
 
 
-# Read Excel dataset
 def load_data():
     data_path = "data/midtermProject-part2-data.xlsx"
     df = pd.read_excel(data_path)
@@ -36,18 +33,15 @@ def load_data():
     return df, X, feature_names
 
 
-# Randomly choose k data points as initial centroids
 def initialize_centroids(X, k):
     indices = np.random.choice(X.shape[0], k, replace=False)
     return X[indices]
 
 
-# Euclidean distance between two points
 def euclidean_distance(point1, point2):
     return np.sqrt(np.sum((point1 - point2) ** 2))
 
 
-# Assign each record to the nearest centroid
 def assign_clusters(X, centroids):
     clusters = []
 
@@ -63,14 +57,12 @@ def assign_clusters(X, centroids):
     return np.array(clusters)
 
 
-# Update centroid of each cluster
 def update_centroids(X, clusters, k):
     new_centroids = []
 
     for i in range(k):
         cluster_points = X[clusters == i]
 
-        # If a cluster becomes empty, choose a random point
         if len(cluster_points) == 0:
             random_index = np.random.randint(0, X.shape[0])
             new_centroids.append(X[random_index])
@@ -81,7 +73,6 @@ def update_centroids(X, clusters, k):
     return np.array(new_centroids)
 
 
-# K-means algorithm from scratch
 def kmeans(X, k, max_iter=100, tolerance=1e-6):
     centroids = initialize_centroids(X, k)
 
@@ -101,7 +92,6 @@ def kmeans(X, k, max_iter=100, tolerance=1e-6):
     return clusters, centroids
 
 
-# Within Cluster Sum of Squares
 def compute_wcss(X, clusters, centroids):
     wcss = 0.0
 
@@ -113,7 +103,6 @@ def compute_wcss(X, clusters, centroids):
     return wcss
 
 
-# Between Cluster Sum of Squares
 def compute_bcss(X, clusters, centroids):
     overall_mean = np.mean(X, axis=0)
     bcss = 0.0
@@ -128,12 +117,10 @@ def compute_bcss(X, clusters, centroids):
     return bcss
 
 
-# Dunn Index
 def compute_dunn_index(X, clusters, k):
     max_intra_cluster_distance = 0.0
     min_inter_cluster_distance = float("inf")
 
-    # Maximum intra-cluster diameter
     for cluster_id in range(k):
         cluster_points = X[clusters == cluster_id]
 
@@ -146,7 +133,6 @@ def compute_dunn_index(X, clusters, k):
                 if dist > max_intra_cluster_distance:
                     max_intra_cluster_distance = dist
 
-    # Minimum inter-cluster distance
     for cluster_i in range(k):
         points_i = X[clusters == cluster_i]
 
@@ -171,7 +157,6 @@ def compute_dunn_index(X, clusters, k):
     return min_inter_cluster_distance / max_intra_cluster_distance
 
 
-# Write clustering results to result.txt
 def write_results(clusters, k, wcss, bcss, dunn_index):
     with open("result.txt", "w", encoding="utf-8") as f:
         for i, cluster_id in enumerate(clusters):
@@ -189,34 +174,7 @@ def write_results(clusters, k, wcss, bcss, dunn_index):
         f.write("Dunn Index: {:.6f}\n".format(dunn_index))
 
 
-# Visualization menu
-def visualize_clusters(X, clusters, feature_names):
-    print("\nData / Cluster Visualization")
-    print("----------------------------")
-    print("Available variables:")
-
-    for i, feature in enumerate(feature_names):
-        print("{} - {}".format(i, feature))
-
-    try:
-        x_index = int(input("Select x-axis variable index: "))
-        y_index = int(input("Select y-axis variable index: "))
-    except ValueError:
-        print("Invalid input. Please enter integer indices.")
-        return
-
-    if x_index < 0 or x_index >= len(feature_names):
-        print("Invalid x-axis index.")
-        return
-
-    if y_index < 0 or y_index >= len(feature_names):
-        print("Invalid y-axis index.")
-        return
-
-    if x_index == y_index:
-        print("X and Y axis cannot be the same.")
-        return
-
+def plot_single_pair(X, clusters, feature_names, x_index, y_index, show_plot=False):
     marker_list = ["o", "s", "^", "D", "x", "*", "P", "v", "<", ">"]
     color_list = ["red", "blue", "green", "purple", "orange", "brown", "pink", "gray", "olive", "cyan"]
 
@@ -250,7 +208,55 @@ def visualize_clusters(X, clusters, feature_names):
     plt.savefig(file_name, dpi=300, bbox_inches="tight")
     print("Visualization saved to:", file_name)
 
-    plt.show()
+    if show_plot:
+        plt.show()
+    else:
+        plt.close()
+
+
+def save_required_visualizations(X, clusters, feature_names):
+    required_pairs = [
+        (0, 2),  # Başçevre vs Kilo
+        (0, 1),  # Başçevre vs Boy
+        (1, 2)   # Boy vs Kilo
+    ]
+
+    print("\nSaving required 3 visualizations...")
+
+    for x_index, y_index in required_pairs:
+        plot_single_pair(X, clusters, feature_names, x_index, y_index, show_plot=False)
+
+    print("All required visualizations were saved into the visuals folder.")
+
+
+def visualize_clusters(X, clusters, feature_names):
+    print("\nData / Cluster Visualization")
+    print("----------------------------")
+    print("Available variables:")
+
+    for i, feature in enumerate(feature_names):
+        print("{} - {}".format(i, feature))
+
+    try:
+        x_index = int(input("Select x-axis variable index: "))
+        y_index = int(input("Select y-axis variable index: "))
+    except ValueError:
+        print("Invalid input. Please enter integer indices.")
+        return
+
+    if x_index < 0 or x_index >= len(feature_names):
+        print("Invalid x-axis index.")
+        return
+
+    if y_index < 0 or y_index >= len(feature_names):
+        print("Invalid y-axis index.")
+        return
+
+    if x_index == y_index:
+        print("X and Y axis cannot be the same.")
+        return
+
+    plot_single_pair(X, clusters, feature_names, x_index, y_index, show_plot=True)
 
 
 def main():
@@ -260,7 +266,6 @@ def main():
     print("Dataset shape:", df.shape)
     print("Feature names:", feature_names)
 
-    # Normalize all variables before clustering
     data_min, data_max = minmax_fit(X)
     X_norm = minmax_transform(X, data_min, data_max)
 
@@ -288,6 +293,7 @@ def main():
     dunn_index = compute_dunn_index(X_norm, clusters, k)
 
     write_results(clusters, k, wcss, bcss, dunn_index)
+    save_required_visualizations(X_norm, clusters, feature_names)
 
     print("\nClustering completed.")
     print("Results saved to: result.txt")
